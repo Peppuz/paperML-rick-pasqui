@@ -1,0 +1,159 @@
+\usepackage{chngcntr}
+
+
+\documentclass[fleqn,10pt]{SelfArx} % Document font size and equations flushed left
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel} % Specify a different language here - english by default
+\usepackage{graphicx}
+\usepackage{lipsum} % Required to insert dummy text. To be removed otherwise
+
+%----------------------------------------------------------------------------------------
+% COLUMNS
+%----------------------------------------------------------------------------------------
+
+\setlength{\columnsep}{0.55cm} % Distance between the two columns of text
+\setlength{\fboxrule}{0.75pt} % Width of the border around the abstract
+
+%----------------------------------------------------------------------------------------
+% COLORS
+%----------------------------------------------------------------------------------------
+
+
+\definecolor{color1}{RGB}{0,0,90} % Color of the article title and sections
+\definecolor{color2}{RGB}{0,20,20} % Color of the boxes behind the abstract and headings
+
+%----------------------------------------------------------------------------------------
+% HYPERLINKS
+%----------------------------------------------------------------------------------------
+
+\usepackage{hyperref} % Required for hyperlinks
+\hypersetup{hidelinks,colorlinks,breaklinks=true,urlcolor=color2,citecolor=color1,linkcolor=color1,bookmarksopen=false,pdftitle={Title},pdfauthor={Author}}
+
+%----------------------------------------------------------------------------------------
+% ARTICLE INFORMATION
+%----------------------------------------------------------------------------------------
+
+\JournalInfo{Progetto di Machine Learning} % Journal information
+\Archive{Anno Accademico 2018/2019} % Additional notes (e.g. copyright, DOI, review/research article)
+
+\PaperTitle{Global Terrorism} % Article title
+
+\Authors{Riccardo Cervero\textsuperscript{1}, Marco Apa\textsuperscript{2}, Pasquale Paolicelli\textsuperscript{3}} % Authors
+\affiliation{\textsuperscript{1}\textit{Universita` degli Studi di Milano Bicocca, CdLM Data Science}} % Author affiliation
+\affiliation{\textsuperscript{2}\textit{Universita` degli Studi di Milano Bicocca, CdLM Data Science}} % Author affiliation
+\affiliation{\textsuperscript{1}\textit{Universita` degli Studi di Milano Bicocca, CdLM CLAMSES}} % Author affiliation
+
+\Keywords{Terrorism --- Multiclass problem -- Imbalanced class} % Keywords - if you don't want any simply remove all the text between the curly brackets
+\newcommand{\keywordname}{Keywords} % Defines the keywords heading name
+%----------------------------------------------------------------------------------------
+% ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\Abstract{Il terrorismo globale è ormai, in ogni sua forma, dipendente dall’applicazione  di Information and Communication Technologies sempre più potenti, utilizzate per comunicare attraverso la rete degli affiliati, convertire nuovi adepti alla propria ideologia e organizzare gli attacchi. Allo stesso modo, le forze statali e internazionali impegnate nella difesa investono nello sviluppo di tecniche e modelli predittivi avanzati, in grado di ridurre l’imprevedibilità degli attentati e impostare strategie efficaci. Il seguente lavoro si propone di trovare una metodologia di Machine Learning capace di individuare il modus operandi di un gruppo terroristico. Attraverso varie categorie di modelli di classificazione supervisionata si cercherà, dunque, di estrapolare un set di caratteristiche ricorrenti per ogni associazione, con un certo livello di affidabilità sulla previsione. Dopo un’importante fase di pulizia, preparazione dei dati e selezione degli attributi esplicativi, l'obiettivo ha presentato due questioni fondamentali: l’adozione di specifici approcci per la risoluzione del problema di classificazione supervisionata multiclasse e la gestione del forte sbilanciamento delle osservazioni verso alcuni valori della variabile d’interesse, ovvero la cosiddetta problematica di class imbalance. Inoltre, nell
+
+’ultima sezione, sarà impiegato il metodo di Boosting per stimare in maniera migliore la misura di Accuratezza.}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\flushbottom % Makes all text pages the same height
+
+\maketitle % Print the title and abstract box
+
+\tableofcontents % Print the contents section
+
+\thispagestyle{empty} % Removes page numbering from the first page
+
+%----------------------------------------------------------------------------------------
+% ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section*{Introduzione} % The \section*{} command stops section numbering
+
+\addcontentsline{toc}{section}{Introduzione} % Adds this section to the table of contents
+
+Il terrorismo è un fenomeno storico di sempre maggiore interesse, a causa della crescente frequenza  di attentati compiuti, l’incremento del numero di agenti coinvolti, l’aumento dell’impatto sociale e culturale all’interno delle comunità colpite e la capacità di espandersi a livello globale grazie all’uso massivo dei nuovi mass media. Le Intelligence impegnate nell’attività di Contro-terrorismo necessitano di tecnologie migliori per combattere le minacce, incrementando le analisi sulla mole di dati relativi ai diversi gruppi terroristici, al fine di prevedere, con maggiore affidabilità, le caratteristiche dei futuri attentati. La seguente trattazione si propone di suggerire un modello di analisi predittiva mirato ad identificare l’esistenza di una “firma” riferita ad ogni associazione terroristica, ovvero sviluppare una modalità per ricondurre univocamente e precisamente le caratteristiche di un determinato attacco al nome del gruppo per conto del quale hanno agito gli esecutori. I dati utilizzati provengono dal Global Terrorism Database \footnote{https://www.start.umd.edu/gtd/downloads/Codebook.pdf} (GTD). Esso consiste in una raccolta a livello globale di osservazioni relative ad attentati terroristici verificatisi nel periodo fra il 1970 e il 2017. Il database è amministrato e aggiornato dal National Consortium for the Study of Terrorism and Respondes to Terrorism. 
+
+È opportuno cominciare l'analisi dalla definizione del fenomeno oggetto di studio. A tal proposito, la documentazione riferita al dataset GTD definisce l’attentato terroristico come uso minacciato o effettivo della forza e della violenza illegale da parte di un attore non statale, per raggiungere un obiettivo politico, economico, religioso o sociale attraverso la paura, la coercizione o l'intimidazione. Il database raccoglie originariamente 180000 osservazioni, descritte da 153 attributi di vario genere (binari, stringhe, numerici) e raggruppati in 9 aree tematiche.  
+
+
+%------------------------------------------------
+
+\section{Preprocessing}
+
+
+
+\subsection{Feature Selection}
+La selezione degli attributi significativi per la domanda d’analisi non ha implicato l’utilizzo di algoritmi specifici, bensì è stata condotta seguendo alcuni criteri logici:   
+
+Eccessiva presenza di missing value all’interno di un campo, condizione che influenza negativamente la classificazione.   
+
+Assenza sistematica dei valori di un attributo: è il caso, ad esempio, delle variabili claimede individual, i cui dati sono stati registrati soltanto a partire dall’anno 1997. È pertanto necessario rimuovere questi campi per non falsare il risultato dell’analisi.  
+
+Forte Class Imbalance nello specifico caso di attributi binari: per questo tipo di variabili – come, fra le altre, crit1, crit2 e extended-, non è possibile ovviare al problema di sbilanciamento delle classi, ad esempio mediante aggregazione. Pertanto, si è deciso di escluderle.   
+
+Parte dei dati è affetta da varie tipologie di ridondanza informativa:   
+
+Alcuni campi - come targsubtype1 e weapsubtype1 - sono stati esclusi dall’analisi poiché nel database è già presente la loro versione aggregata, più interpretabile e utile all’addestramento del modello di classificazione.   
+
+Il GTD contiene versioni del tutto identiche della stessa
+
+variabile, come accade per targtype1, targtype2e targtype3. 
+Un particolare attributo corp1, accoglie valori identici a ? soltanto in alcune osservazioni, perciò il suo utilizzo nel processo di classificazione potrebbe penalizzare l’analisi.  
+Attributi come latitudee longitudesono state scartate poiché presentano un elevatissimo numero di classi, rischiando di aumentare eccessivamente il costo computazionale e peggiorare l’interpretabilità del modello.     
+La nostra analisi si propone di offrire un approccio in grado di capire se è possibile identificare una firma dei gruppi terroristici in base alle caratteristiche del loro modus operandi e non in base alla provenienza geografica e all’anno di riferimento. È il caso, ad esempio, di iyear, region, country e natly1, la quale registra la nazionalità delle vittime. Queste variabili devono essere necessariamente estromesse durante l’addestramento del modello, poiché distorsive per la ragione riportata. In più, questi valori sono spesso in stretta dipendenza con il gruppo terroristico a cui si riferiscono, producendo un elevato rischio di overfitting. 
+Gli altri attributi esclusi non aggiungono informazioni utili alla domanda d’analisi. 
+Come risultato del procedimento di Feature Selection appena descritto, le caratteristiche degli attentati scelte per la risoluzione del problema di classificazione sono:gname, la variabile target nominale che registra il nome del gruppo terroristico;  imonth, il mese – espresso in numero – in cui è avvenuto l’attacco;  multiple, che presenta valore 1 se l’atto fa parte di una serie di attacchi concatenati, 0 altrimenti;  success, pari a 1 se l’attacco ha avuto successo, cioè se si sono verificate delle conseguenze tangibili in base al tipo di attacco, valutando in maniera globale l’azione nel caso di un attentato multiplo;  suicide– “1” se l’attentato ha implicato il suicidio degli attentatori, 0 altrimenti; targtype1, il che riassume in ventuno classi la categoria generale relativa alla vittima o al target; weaptype1 indica i dodici tipi di arma utilizzata dagli attentatori;  nkill riporta il numero di vittime confermate per il dato attacco;  nwound-il numero di feriti confermati per il dato attacco;  INT-ANY, che presenta valore 1 se l’attacco è internazionale dal punto di vista di tre dimensioni: logistica, ideologica o l’unione di entrambe. Infine, attacktype1 rappresenta la metodologia di attacco in base a otto categorie: \textit{Assassination, Hijacking,Kidnapping, Barricade Incident, Bombing Explosion, Armed Assault, Unarmed Assault, Facility/Infrastructure Attack.}
+
+
+
+\subsection{Data Cleaning}
+Dopo aver convertito gli attributi al tipo migliore per condurre l’analisi in Knime, e quindi per elaborare in modo corretto i record, si è proceduto alla gestione dei valori mancanti. Le variabili nel dataset originario, come indicato nel Codebook, presentavano otto diverse codifiche[1]per i missing value. Una volta identificati, le osservazioni cui appartenevano sono state rimosse, poiché, in base alle informazioni disponibili, non sarebbe stato possibile sostituire i valori in maniera sensata.
+\subsection{Riduzione delle classi di gname}
+La variabile target presenta un numero di classi evidentemente troppo elevato – 2971, molti dei principali gruppi terroristici esistiti dal 1970 fino ad oggi –, rendendo quasi impossibile o del tutto inefficace la conduzione di una classificazione supervisionata utile alla nostra analisi. In più, gname è affetta da un grave sbilanciamento delle classi, evidente dal grafico sottostante:
+
+\graphicspath{ {./images/} }
+
+\documentclass{article}
+\subsection{Aggregazione}
+\lipsum[9] % Dummy text
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{results}
+\caption{In-text Picture}
+\label{fig:results}
+\end{figure}
+
+Reference to Figure \ref{fig:results}.
+
+%------------------------------------------------
+
+\section{Metodi di valutazione delle prestazioni}
+\section{Modelli di classificazione e interpretazione dei risultati}
+\subsection{Euristici}
+\subsection{Support Vector Machine}
+\subsection{Modelli p
+
+robabilistici}
+\subsection{Bayesian Nets}
+\subsection{Artifical neural network}
+\subsection{Classificatori ibridi}
+\section{Analisi dei risultati per ogni classe della variabile target}
+\section{Uso dell’Adaptive Boosting per migliorare la stima della misura di Accuratezza}
+\section{Conclusione e suggerimenti per future analisi}
+
+%------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+% REFERENCE LIST
+%----------------------------------------------------------------------------------------
+\phantomsection
+\bibliographystyle{unsrt}
+\bibliography{sample}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
